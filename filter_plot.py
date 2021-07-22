@@ -1,4 +1,3 @@
-import csv
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -73,17 +72,3 @@ plt.xlim(0, )
 plt.subplots_adjust(left=0.01, bottom=0.05, right=1, top=1)
 plt.show()
 
-
-################################################## keypoint
-flag = 0
-for i in label_column:
-    if i == 9 and flag == 0:
-        i = 0
-    elif i == 9 and flag == 1:환
-        i = 1
-    elif i == 1 and flag == 0:
-        flag = 1
-    elif i == 0 and flag == 1:
-        flag = 0
-    label_column에 row = i로 변환
-########################################################
