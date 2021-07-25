@@ -2,12 +2,9 @@ from numpy import mean, std, dstack
 from pandas import read_csv
 import tensorflow.keras as tf
 from tensorflow.python.keras.utils.np_utils import to_categorical
-import matplotlib.pyplot as plt
 
 
 # load a single file as a numpy array
-
-
 def load_file(filepath):
     dataframe = read_csv(filepath, header=None, delim_whitespace=True)
     return dataframe.values
