@@ -26,18 +26,6 @@ for row, label in label_data.iteritems():
     elif label == 0 and flag == 1:
         flag = 0
 
-# 9 to 0
-flag = 0
-for row, label in label_data.iteritems():
-    if label == 9 and flag == 0:
-        df.at[row, 'illuminance_onoff'] = off_value
-    elif label == 9 and flag == 1:
-        df.at[row, 'illuminance_onoff'] = on_value
-    elif label == 1 and flag == 0:
-        flag = 1
-    elif label == 0 and flag == 1:
-        flag = 0
-
 # night time filter
 cnt = 0
 for (row, light), (i, label), (j, time) in zip(light_data.iteritems(), label_data.iteritems(), time_data.iteritems()):
