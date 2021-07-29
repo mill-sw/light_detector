@@ -1,58 +1,96 @@
-import csv
-import os
-import matplotlib.pyplot as plt
+import glob
 import numpy as np
+import pandas as pd
+import plotly.express as px
+# import plotly.graph_objects as go
 
 
-f = open("test2.csv", 'r', encoding='utf-8')
-rdr = csv.reader(f)
-for line1 in rdr:
-    # print(line1)
-    break
+# path
+path = '/home/z/PycharmProjects/test/label/'
+filepath = 'labeling_NW0514.csv'
+for i in glob.glob(path + '*.csv'):
+    df = pd.read_csv(i)
+    df = df[['device_field03', 'illuminance_onoff', 'device_data_reg_dtm']]
+    df = df.assign(new = df['illuminance_onoff'])
+    time_data = df['device_data_reg_dtm']
+    label_data = df['illuminance_onoff']
+    light_data = df['device_field03']
+    new = df['new']
+    # label_original = df['illuminance_onoff']
+    # print(df2.head())
 
-data = []
-date = None
-for line1 in rdr:
-    if date == None:
-        date = line1[10][:10]
-        data.append([line1[10][11:], line1[4]])
-        continue
-    if date != line1[10][:10]:
+    # on_value = 30
+    # off_value = 0
+    # # label 0,1,9
+    # for row, label in label_data.iteritems():
+    #     if label == 9:
+    #         df.at[row, 'illuminance_onoff'] = off_value
+    #     elif label == 1:
+    #         df.at[row, 'illuminance_onoff'] = on_value
+    #     elif label == 0:
+    #         df.at[row, 'illuminance_onoff'] = off_value
 
-        # for k in range(len(data)):
-        #
-        #     data[k].append(int(data[k][0][:2]) + int(data[k][0][3:5])/60.0)
-        #
-        #
-        # for k in range(len(data)):
-        #     if k == 0:
-        #         data[k].append(0)
-        #     else:
-        #         dif = int(data[k][1]) - int(data[k-1][1])
-        #         if dif != 0:
-        #             data[k].append(dif/5)#threshold
-        #         else:
-        #             data[k].append(0)
-        #
-        # fig = plt.figure()
-        # plt.plot([i[2] for i in data],[int(i[1]) for i in data])
-        # plt.plot([i[2] for i in data],[int(i[3])-10 for i in data])
-        # # plt.xticks([i for i in range(len(data)) if i % 6 == 0], [i for i in range(24)])
-        # plt.show()
-        #
-        #
-        # k = 10
-        # plt.close()
-        f1 = open("data/" + date + ".csv", 'w', encoding='euc-kr')
-        f1.write(
-            '"등록일시","조도"\n')
-        for a in data:
-            f1.writelines(",".join(a))
-            f1.write("\n")
-        f1.close()
-        date = line1[10][:10]
-        data = []
-    else:
-        data.append([line1[10][11:], line1[4]])
+    # label 0,1,9
+    on = 30
+    off = -1
+    prev = 0
+    for row, now in label_data.iteritems():
+        if now == 1 and prev == 0:
+            df.at[row, 'new'] = on
+        elif now == 0 and prev == 1:
+            df.at[row-1, 'new'] = 0
+            df.at[row, 'new'] = off
+        elif now == 9:
+            df.at[row, 'new'] = 0
+        prev = now
 
-    # print("시간 " + line1[9] + "\t조도 " + line1[4])
+
+
+    # # 9 to 0
+    # flag = 0
+    # for row, label in label_data.iteritems():
+    #     if label == 9 and flag == 0:
+    #         df.at[row, 'illuminance_onoff'] = off_value
+    #     elif label == 9 and flag == 1:
+    #         df.at[row, 'illuminance_onoff'] = on_value
+    #     elif label == 1 and flag == 0:
+    #         flag = 1
+    #     elif label == 0 and flag == 1:
+    #         flag = 0
+    #
+    # # night time filter
+    # cnt = 0
+    # for (row, light), (i, label), (j, time) in zip(light_data.iteritems(), label_data.iteritems(), time_data.iteritems()):
+    #     t = time[11:13]
+    #     if light < 5: df.at[row, 'illuminance_onoff'] = off_value
+    #     if 9 < int(t) < 18: df.at[row, 'illuminance_onoff'] = off_value
+    #
+    # # threadhold filter
+    # mx = light_data.max()
+    # light = 0
+    # threshold = 15
+    # prev = 0
+    # flag = 0
+    # for row, now in light_data.iteritems():
+    #     if now - prev > threshold and flag == 0:
+    #         df.at[row, 'illuminance_onoff'] = on_value
+    #         flag = 1
+    #     elif prev - now > threshold and flag == 1:
+    #         df.at[row-1, 'illuminance_onoff'] = on_value
+    #         flag = 0
+    #     if flag == 1:
+    #         df.at[row, 'illuminance_onoff'] = on_value
+    #     # elif flag == 1 and -1 < prev - now < 1:
+    #     #     df.at[row, 'illuminance_onoff'] = on_value
+    #     # elif flag == 0:
+    #     #     df.at[row, 'illuminance_onoff'] = off_value
+    #     prev = now
+
+    # plot
+    fig = px.line(df, x='device_data_reg_dtm', y=['device_field03', 'new', 'illuminance_onoff'])
+    # fig = go.Figure()
+    # fig.add_trace(go.Scatter(x=time_data, y=new, mode='markers', name='marker'))
+    # fig.add_trace(go.Scatter(x=time_data, y=label_data, mode='lines+markers', name='line+marker'))
+    # fig.add_trace(go.Scatter(x=time_data, y=[light_data, label_data], mode='lines', name='line'))
+    fig.update_xaxes(rangeslider_visible=True)
+    fig.show()
