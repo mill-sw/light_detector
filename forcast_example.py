@@ -57,3 +57,4 @@ fig = px.line(df, x='device_data_reg_dtm', y=['device_field03', 'illuminance_ono
 fig.update_xaxes(rangeslider_visible=True)
 fig.show()
 
+
